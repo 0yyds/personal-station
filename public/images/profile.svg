@@ -1,0 +1,14 @@
+<svg width="500" height="500" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="500" height="500" fill="#5686F5"/>
+  
+  <!-- 简化的人物轮廓 -->
+  <circle cx="250" cy="180" r="90" fill="#FFFFFF"/>
+  <path d="M250 290C180 290 120 350 120 420V500H380V420C380 350 320 290 250 290Z" fill="#FFFFFF"/>
+  
+  <!-- 装饰元素 -->
+  <circle cx="100" cy="100" r="30" fill="#7792FF" opacity="0.7"/>
+  <circle cx="400" cy="150" r="40" fill="#7792FF" opacity="0.7"/>
+  <circle cx="150" cy="400" r="50" fill="#7792FF" opacity="0.7"/>
+  <circle cx="350" cy="350" r="35" fill="#7792FF" opacity="0.7"/>
+</svg>

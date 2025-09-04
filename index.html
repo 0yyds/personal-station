@@ -1,0 +1,1760 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>个人网站预览</title>
+  <style>
+    :root {
+      --primary-light: #3b82f6;
+      --primary-dark: #60a5fa;
+      --bg-light: #fff;
+      --bg-dark: #111827;
+      --text-light: #1f2937;
+      --text-dark: #f3f4f6;
+      --text-secondary: #4b5563;
+      --text-secondary-dark: #d1d5db;
+      --text-muted: #6b7280;
+      --text-muted-dark: #9ca3af;
+      --border-light: #e5e7eb;
+      --border-dark: #374151;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: var(--bg-light);
+      color: var(--text-light);
+      line-height: 1.6;
+      overflow-x: hidden;
+      overscroll-behavior: none;
+    }
+    
+    .dark {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    /* 关于模块的container左对齐 */
+    #about .container {
+      margin: 0;
+      padding: 0 20px;
+    }
+    header {
+      padding: 1rem 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary-light);
+      font-family: 'yech', cursive;
+    }
+    
+    .dark .logo {
+      color: var(--primary-dark);
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+    
+    .nav-links a {
+      text-decoration: none;
+      color: white;
+      font-weight: 300;
+      transition: color 0.3s;
+      position: relative;
+    }
+    
+    .nav-links a:hover {
+      color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .nav-link.active {
+      color: white;
+      font-weight: 600;
+    }
+    main {
+      padding: 0;
+    }
+    
+    .video-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+    
+    .video-background video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: cover;
+    }
+    
+    .video-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: transparent;
+      opacity: 0;
+      transition: opacity 1s ease, background-color 1s ease;
+    }
+    
+    .video-overlay.show {
+      background-color: rgba(0, 0, 0, 0.75);
+    }
+    
+    .dark .video-overlay.show {
+      background-color: rgba(0, 0, 0, 0.85);
+    }
+    
+    /* 模块样式 */
+    .section {
+      height: 56.25vw; /* 根据562x316比例计算的高度 */
+      max-height: 100vh;
+      min-height: 500px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      padding-top: 80px; /* 导航栏安全区域 */
+    }
+    
+    /* 随记模块背景 */
+    #blog {
+      background-image: url('个站材料/bg2.gif');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    
+    /* 关于模块背景 */
+    #about {
+      background-image: url('个站材料/bg3.gif');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    
+    .section.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    /* 确保首页模块默认可见 */
+    .section#home {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      height: calc(100% - 80px); /* 减去导航栏安全区域高度 */
+      position: relative;
+      padding: 0 2rem;
+    }
+    
+    .hero-content {
+      max-width: 800px;
+      margin: 0 auto;
+      z-index: 2;
+      padding: 2rem 0;
+    }
+    
+    .hero-content h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #ffffff;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      line-height: 1.2;
+    }
+    
+    .hero-content p {
+      font-size: 1.25rem;
+      color: #f3f4f6;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    }
+    
+    /* 文字缓进动效 */
+    .fade-in-text {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 1s ease forwards;
+      animation-play-state: paused;
+    }
+    
+    .fade-in-text:nth-child(2) {
+      animation-delay: 0.3s;
+    }
+    
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* 滚动指示器样式 */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+    
+    /* 初始隐藏遮罩层样式已合并到上方 */
+    
+    /* 显示状态 */
+    .video-overlay.show {
+      opacity: 1;
+    }
+    
+    .scroll-indicator.show {
+      opacity: 1;
+    }
+    
+    .mouse-icon {
+      margin-bottom: 10px;
+    }
+    
+    .arrow-down {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5px;
+      animation: bounce 2.5s infinite;
+    }
+    
+    @keyframes bounce {
+      0% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(15px);
+        opacity: 0;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .hero-content h1 {
+        font-size: 2.5rem;
+      }
+    }
+    
+    .btn {
+      display: inline-block;
+      background: var(--primary-light);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+    
+    .dark .btn {
+      background: var(--primary-dark);
+    }
+    
+    .btn:hover {
+      background-color: #2563eb;
+      transform: translateY(-2px);
+    }
+    
+    .dark .btn:hover {
+      background-color: #3b82f6;
+    }
+    
+    .section-title {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      margin-top: 2rem;
+      text-align: center;
+    }
+    
+    .article-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      padding-top: 1rem;
+    }
+    
+    .blog-title {
+       position: absolute;
+       top: 90px;
+       left: 50px;
+       font-size: 2rem;
+       font-weight: bold;
+       color: var(--text-light);
+       z-index: 30;
+       margin: 0;
+       padding: 0.5rem 0;
+     }
+    
+    .dark .blog-title {
+      color: var(--text-dark);
+    }
+    
+    .blog-container {
+      position: relative;
+      width: 100%;
+      height: auto;
+      min-height: 1100px;
+      overflow: hidden;
+      padding-top: 180px;
+      padding-bottom: 8rem;
+      display: flex;
+      align-items: center;
+    }
+    .blog-carousel {
+       width: calc(100% + 60vw);
+       height: 100%;
+       position: relative;
+       margin-left: 0;
+     }
+     
+     .blog-track {
+       display: flex;
+       width: calc(100% + 40vw);
+       height: 100%;
+       transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+       margin-left: 0;
+     }
+    
+    .blog-card {
+      flex: 0 0 calc((100vw - 40px) / 4.5);
+      height: 100%;
+      margin-right: 1.2rem;
+      opacity: 0;
+      transform: translateY(50px) scale(0.9);
+      transition: all 3s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-origin: center;
+    }
+    
+    .blog-card:hover {
+      transform: scale(1.01) !important;
+      z-index: 10;
+    }
+    
+    .blog-card:nth-child(n) {
+      transform: translateY(50px) scale(1);
+    }
+    
+    .blog-card.animate-in {
+      opacity: 1;
+      transform: translateY(0) scale(0.9);
+    }
+    
+    .blog-card.animate-in:nth-child(n) {
+      transform: translateY(0) scale(1);
+    }
+    
+    .blog-controls {
+      position: absolute;
+      bottom: 50px;
+      right: calc((100vw - 1200px) / 2 + 20px);
+      display: flex;
+      gap: 0.5rem;
+      z-index: 30;
+    }
+    
+    @media (max-width: 1240px) {
+      .blog-controls {
+        right: 20px;
+      }
+    }
+    
+    .blog-nav-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(10px);
+    }
+    
+    .blog-nav-btn:hover {
+      background: rgba(255, 255, 255, 1);
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .blog-nav-btn:active {
+      transform: scale(0.95);
+    }
+    
+    .blog-nav-btn svg {
+      color: #374151;
+    }
+    
+    .blog-nav-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .blog-nav-btn:disabled:hover {
+      background: rgba(255, 255, 255, 0.9);
+      transform: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* 卡片展开按钮样式 */
+    .card-expand-btn {
+      position: absolute;
+      bottom: 15px;
+      right: 15px;
+      width: 36px;
+      height: 36px;
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 10;
+      color: #333;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    .card-expand-btn:hover {
+      background: rgba(255, 255, 255, 1);
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .card-expand-btn svg {
+      transition: transform 0.3s ease;
+    }
+    
+    .card-expand-btn:hover svg {
+        transform: rotate(90deg);
+      }
+      
+      /* 浮层卡片模态框样式 */
+      .card-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      
+      .card-modal.show {
+        opacity: 1;
+      }
+      
+      .modal-backdrop {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      
+      .modal-card {
+        position: relative;
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        transform: scale(0.9) translateY(20px);
+        transition: transform 0.3s ease;
+        z-index: 1001;
+      }
+      
+      .card-modal.show .modal-card {
+        transform: scale(1) translateY(0);
+      }
+      
+      .modal-close-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        width: 40px;
+        height: 40px;
+        background: rgba(0, 0, 0, 0.1);
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: #666;
+      }
+      
+      .modal-close-btn:hover {
+        background: rgba(0, 0, 0, 0.2);
+        transform: scale(1.1);
+        color: #333;
+      }
+      
+      .modal-content {
+        padding-top: 1rem;
+      }
+      
+      .modal-category {
+        display: inline-block;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 1rem;
+      }
+      
+      .modal-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 1rem;
+        line-height: 1.3;
+      }
+      
+      .modal-description {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #666;
+        margin: 0;
+      }
+      
+      /* 暗色模式下的浮层样式 */
+      .dark .modal-card {
+        background: #1a1a1a;
+        color: white;
+      }
+      
+      .dark .modal-title {
+        color: white;
+      }
+      
+      .dark .modal-description {
+        color: #ccc;
+      }
+      
+      .dark .modal-close-btn {
+        background: rgba(255, 255, 255, 0.1);
+        color: #ccc;
+      }
+      
+      .dark .modal-close-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+      }
+      
+      /* 响应式设计 */
+    @media (max-width: 768px) {
+      .blog-controls {
+        bottom: 40px;
+        right: 40px;
+      }
+      
+      .blog-nav-btn {
+        width: 40px;
+        height: 40px;
+      }
+      
+      .card-expand-btn {
+        width: 32px;
+        height: 32px;
+        bottom: 12px;
+        right: 12px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .blog-controls {
+        bottom: 20px;
+        right: 20px;
+      }
+      
+      .blog-nav-btn {
+        width: 36px;
+        height: 36px;
+      }
+      
+      .card-expand-btn {
+        width: 28px;
+        height: 28px;
+        bottom: 10px;
+        right: 10px;
+      }
+    }
+    
+
+    
+    /* 关于页面样式 */
+    .about-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+      padding-top: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+      .about-content {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .about-text h3 {
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      color: var(--color-primary-light);
+    }
+    
+    .dark .about-text h3 {
+      color: var(--color-primary-dark);
+    }
+    
+    .about-text:first-child h3:first-child {
+      margin-top: 0;
+    }
+    
+    .about-text ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    
+    .about-text li {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    
+    .dark .about-text li {
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .about-image {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    #blog .article-card {
+      border-radius: 1.5rem;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      background-color: white;
+      height: calc(100vw / 3.8 + 200px - 70px);
+    }
+    
+    #blog .modern-card {
+      position: relative;
+      cursor: pointer;
+    }
+    
+    #blog .modern-card:hover {
+      transform: translateY(-8px) scale(1.01);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+    
+    #blog .card-background {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      border-radius: 1.5rem;
+      overflow: hidden;
+    }
+    
+    #blog .card-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 100%);
+    }
+    
+    #blog .card-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 2rem;
+      color: white;
+      z-index: 2;
+    }
+    
+    #blog .card-category {
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+      opacity: 0.9;
+    }
+    
+    #blog .card-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 0 0.75rem 0;
+      line-height: 1.3;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    #blog .card-description {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin: 0;
+      opacity: 0.95;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+    
+    footer {
+      background: #f3f4f6;
+      padding: 3rem 0;
+      margin-top: 4rem;
+    }
+    
+    .dark footer {
+      background: var(--text-light);
+    }
+    
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    @media (max-width: 768px) {
+      .footer-content {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+      }
+    }
+    
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    .footer-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    
+    .dark .footer-links a {
+      color: var(--text-muted-dark);
+    }
+    
+    .footer-links a:hover {
+      color: var(--primary-light);
+    }
+    
+    .dark .footer-links a:hover {
+      color: var(--primary-dark);
+    }
+    
+    .copyright {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    
+    .dark .copyright {
+      color: var(--text-muted-dark);
+    }
+    
+    /* 关于页面样式 */
+    .about-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    
+    @media (max-width: 768px) {
+      .about-grid {
+        gap: 2rem;
+      }
+    }
+    
+    .about-left {
+      text-align: center;
+    }
+    
+    .about-right {
+      text-align: center;
+    }
+    
+    .section-title-left, .about-subtitle, .about-subtitle-center, .contact-title {
+      font-weight: 600;
+      text-align: left;
+      color: var(--text-light);
+    }
+    
+    .section-title-left {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 2rem;
+    }
+    
+    .about-subtitle, .about-subtitle-center, .contact-title {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .about-subtitle-center {
+      margin-bottom: 0.5rem;
+    }
+    
+    .dark .section-title-left, .dark .about-subtitle, .dark .about-subtitle-center, .dark .contact-title {
+      color: var(--text-dark);
+    }
+    
+    .about-section {
+      margin-bottom: 2rem;
+    }
+    
+    .about-text, .about-text-center {
+      font-size: 1.125rem;
+      line-height: 1.7;
+      text-align: left;
+      color: var(--text-secondary);
+    }
+    
+    .about-text {
+      margin-bottom: 1.5rem;
+    }
+    
+    .about-text-center {
+      margin-bottom: 0.75rem;
+    }
+    
+    .dark .about-text, .dark .about-text-center {
+      color: var(--text-secondary-dark);
+    }
+    
+    /* 关于页面垂直布局样式 */
+    .about-vertical {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      max-width: 800px;
+      margin: 0;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .dark .about-vertical {
+      background: rgba(31, 41, 55, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    
+    .about-section-vertical {
+      margin-bottom: 1rem;
+    }
+    .social-links-center {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      justify-content: flex-start;
+      max-width: 600px;
+    }
+    
+    .skills-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 0;
+    }
+    
+    .skills-two-column {
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+      max-width: 800px;
+      margin: 0;
+      text-align: left;
+    }
+    
+    .skills-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      text-align: left;
+    }
+    
+    .skills-divider {
+      width: 1px;
+      background: var(--border-light);
+      min-height: 200px;
+    }
+    
+    .dark .skills-divider {
+      background: var(--border-dark);
+    }
+    
+    @media (max-width: 768px) {
+      .skills-two-column {
+        flex-direction: column;
+        gap: 2rem;
+      }
+      
+      .skills-divider {
+        width: 100%;
+        height: 1px;
+        min-height: 1px;
+      }
+    }
+    
+    .skill-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      text-align: left;
+    }
+    
+    .skill-name {
+      font-weight: 600;
+      color: var(--text-light);
+      font-size: 1.125rem;
+    }
+    
+    .dark .skill-name {
+      color: var(--text-dark);
+    }
+    
+    .skill-description {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    
+    .dark .skill-description {
+      color: var(--text-muted-dark);
+    }
+    .social-links-icons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      justify-content: flex-start;
+      max-width: 600px;
+      margin: 0;
+      text-align: left;
+    }
+    
+    @media (max-width: 480px) {
+      .social-links-icons {
+        justify-content: flex-start;
+        gap: 1rem;
+      }
+    }
+    
+    .social-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      opacity: 0.8;
+    }
+    
+    .social-icon:hover {
+      opacity: 1;
+      transform: translateY(-2px) scale(1.1);
+    }
+    
+    .social-icon svg {
+      fill: var(--text-secondary);
+      transition: all 0.3s ease;
+    }
+    
+    .social-icon:hover svg {
+      fill: var(--text-light);
+    }
+    
+    .dark .social-icon svg {
+      fill: var(--text-secondary-dark);
+    }
+    
+    .dark .social-icon:hover svg {
+      fill: var(--text-dark);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <div class="logo" onclick="refreshToHome()" style="cursor: pointer;">Kuma</div>
+        <div class="nav-links">
+          <a href="#home" class="nav-link active" data-section="home">首页</a>
+          <a href="#blog" class="nav-link" data-section="blog">随记</a>
+          <a href="#about" class="nav-link" data-section="about">关于</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+  
+  <main>
+    <!-- 首页模块 -->
+    <section id="home" class="section active">
+      <div class="video-background">
+        <img src="个站材料/22.gif" id="gif-background" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; display: block; z-index: 1;">
+        <div class="video-overlay" style="z-index: 2;"></div>
+      </div>
+      <div class="container">
+        <div class="hero">
+          <div class="hero-content">
+            <h1 class="fade-in-text">你好，我是Kuma</h1>
+            <p class="fade-in-text">我是一名前端开发者，热爱设计和创造。这个网站展示了我的作品和想法，希望能给您带来一些灵感。</p>
+          </div>
+        </div>
+        <!-- 鼠标和箭头图标 -->
+        <div class="scroll-indicator">
+          <div class="mouse-icon">
+            <svg width="18" height="30" viewBox="0 0 18 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="1" y="1" width="16" height="28" rx="8" stroke="white" stroke-width="1" fill="none"/>
+              <circle cx="9" cy="8" r="1.5" fill="white"/>
+            </svg>
+          </div>
+          <div class="arrow-down">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 7L9 11L13 7" stroke="white" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 7L9 11L13 7" stroke="white" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 随记模块 -->
+    <section id="blog" class="section">
+      <div class="container">
+        <div class="blog-container">
+          <h2 class="blog-title">随记</h2>
+          <div class="blog-carousel">
+            <div class="blog-track">
+              <article class="article-card modern-card blog-card" data-index="0">
+                <div class="card-background" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                  <div class="card-overlay"></div>
+                  <div class="card-content">
+                    <div class="card-category">生活</div>
+                    <h3 class="card-title">有趣的都能做</h3>
+                    <p class="card-description">探索生活中的美好瞬间，记录那些让人会心一笑的小确幸...</p>
+                    <button class="card-expand-btn" onclick="openCardModal(0)">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </article>
+              
+              <article class="article-card modern-card blog-card" data-index="1">
+                <div class="card-background" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                  <div class="card-overlay"></div>
+                  <div class="card-content">
+                    <div class="card-category">创作</div>
+                    <h3 class="card-title">对故事的创作欲</h3>
+                    <p class="card-description">分享创作过程中的灵感来源和技术实现，记录每一次突破...</p>
+                    <button class="card-expand-btn" onclick="openCardModal(1)">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </article>
+              
+              <article class="article-card modern-card blog-card" data-index="2">
+                <div class="card-background" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                  <div class="card-overlay"></div>
+                  <div class="card-content">
+                    <div class="card-category">学习</div>
+                    <h3 class="card-title">简单都能当老师</h3>
+                    <p class="card-description">将复杂的概念用简单的方式表达，让学习变得更加有趣...</p>
+                    <button class="card-expand-btn" onclick="openCardModal(2)">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </article>
+              
+              <article class="article-card modern-card blog-card" data-index="3">
+                <div class="card-background" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                  <div class="card-overlay"></div>
+                  <div class="card-content">
+                    <div class="card-category">娱乐</div>
+                    <h3 class="card-title">休闲玩乐，乐不停</h3>
+                    <p class="card-description">生活不只有工作，还有诗和远方，记录那些快乐时光...</p>
+                    <button class="card-expand-btn" onclick="openCardModal(3)">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </article>
+              
+              <article class="article-card modern-card blog-card" data-index="4">
+                <div class="card-background" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                  <div class="card-overlay"></div>
+                  <div class="card-content">
+                    <div class="card-category">思考</div>
+                    <h3 class="card-title">深度思考录</h3>
+                    <p class="card-description">记录那些深夜的思考，关于人生、技术和未来的哲学思辨...</p>
+                  </div>
+                </div>
+              </article>
+              
+              <article class="article-card modern-card blog-card" data-index="5">
+                <div class="card-background" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
+                  <div class="card-overlay"></div>
+                  <div class="card-content">
+                    <div class="card-category">旅行</div>
+                    <h3 class="card-title">行走的意义</h3>
+                    <p class="card-description">用脚步丈量世界，用心感受不同文化带来的震撼和启发...</p>
+                  </div>
+                </div>
+              </article>
+              
+              <article class="article-card modern-card blog-card" data-index="6">
+                <div class="card-background" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">
+                  <div class="card-overlay"></div>
+                  <div class="card-content">
+                    <div class="card-category">创意</div>
+                    <h3 class="card-title">创意无限</h3>
+                    <p class="card-description">灵感来源于生活的每一个细节，记录那些突如其来的创意火花...</p>
+                  </div>
+                </div>
+              </article>
+              
+              <article class="article-card modern-card blog-card" data-index="7">
+                <div class="card-background" style="background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);">
+                  <div class="card-overlay"></div>
+                  <div class="card-content">
+                    <div class="card-category">感悟</div>
+                    <h3 class="card-title">人生感悟</h3>
+                    <p class="card-description">在人生的路上，每一次经历都是成长，记录那些珍贵的感悟时刻...</p>
+                  </div>
+                </div>
+              </article>
+              
+              <article class="article-card modern-card blog-card" data-index="8">
+                <div class="card-background" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                  <div class="card-overlay"></div>
+                  <div class="card-content">
+                    <div class="card-category">技术</div>
+                    <h3 class="card-title">技术探索</h3>
+                    <p class="card-description">深入探索前沿技术，分享开发过程中的心得体会和技术感悟...</p>
+                  </div>
+                </div>
+              </article>
+              
+              <article class="article-card modern-card blog-card" data-index="9">
+                <div class="card-background" style="background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);">
+                  <div class="card-overlay"></div>
+                  <div class="card-content">
+                    <div class="card-category">分享</div>
+                    <h3 class="card-title">知识分享</h3>
+                    <p class="card-description">将学到的知识整理分享，帮助更多人在学习路上少走弯路...</p>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+          
+        </div>
+        
+        <div class="blog-controls">
+          <button class="blog-nav-btn blog-prev" aria-label="上一页">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button class="blog-nav-btn blog-next" aria-label="下一页">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+
+    <!-- 关于模块 -->
+    <section id="about" class="section">
+      <div class="container">
+        <div class="about-vertical">
+          <!-- 个人简介 -->
+          <div class="about-section-vertical">
+            <h3 class="about-subtitle-center">个人简介</h3>
+            <p class="about-text-center">我是一名专注于用户体验设计和产品开发的设计师，拥有丰富的前端开发和设计工具使用经验。热衷于创造直观、美观且功能强大的数字产品，致力于通过设计和技术的结合为用户带来卓越的体验。</p>
+          </div>
+          
+          <!-- 专业技能 -->
+          <div class="about-section-vertical">
+            <h3 class="about-subtitle-center">专业技能</h3>
+            <div class="skills-two-column">
+              <div class="skills-column">
+                <div class="skill-item">
+                  <span class="skill-name">前端开发</span>
+                  <span class="skill-description">精通HTML、CSS、JavaScript，熟悉React、Vue等现代框架</span>
+                </div>
+                <div class="skill-item">
+                  <span class="skill-name">UI/UX设计</span>
+                  <span class="skill-description">专业的用户界面和用户体验设计，注重用户需求和视觉美感</span>
+                </div>
+                <div class="skill-item">
+                  <span class="skill-name">设计工具</span>
+                  <span class="skill-description">熟练使用Figma、Sketch、Adobe系列等专业设计软件</span>
+                </div>
+              </div>
+              <div class="skills-divider"></div>
+              <div class="skills-column">
+                <div class="skill-item">
+                  <span class="skill-name">原型制作</span>
+                  <span class="skill-description">擅长使用Axure、Figma等工具制作交互原型和高保真设计稿</span>
+                </div>
+                <div class="skill-item">
+                  <span class="skill-name">AI工具</span>
+                  <span class="skill-description">熟练运用Cursor、ChatGPT等AI辅助工具提升工作效率</span>
+                </div>
+                <div class="skill-item">
+                  <span class="skill-name">产品思维</span>
+                  <span class="skill-description">具备产品设计思维，能够从用户角度思考产品功能和体验</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 联系方式 -->
+          <div class="about-section-vertical">
+            <h3 class="about-subtitle-center">联系方式</h3>
+            <div class="social-links-center">
+              <a href="https://twitter.com" target="_blank" class="social-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                </svg>
+              </a>
+              <a href="https://linkedin.com" target="_blank" class="social-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                </svg>
+              </a>
+              <a href="https://github.com" target="_blank" class="social-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+              </a>
+              <a href="#" class="social-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18 0 .659-.52 1.188-1.162 1.188-.642 0-1.162-.529-1.162-1.188 0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18 0 .659-.52 1.188-1.162 1.188-.642 0-1.162-.529-1.162-1.188 0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 0 1 .598.082l1.584.926a.272.272 0 0 0 .14.045c.134 0 .24-.111.24-.248 0-.06-.023-.12-.038-.177l-.327-1.233a.582.582 0 0 1 .134-.55c1.515-1.125 2.5-2.848 2.5-4.633.001-3.671-3.505-6.895-8.016-6.895zm-2.68 3.476c.535 0 .969.441.969.984 0 .544-.434.985-.969.985s-.969-.441-.969-.985c0-.543.434-.984.969-.984zm5.362 0c.535 0 .969.441.969.984 0 .544-.434.985-.969.985s-.969-.441-.969-.985c0-.543.434-.984.969-.984z"/>
+                </svg>
+              </a>
+              <a href="#" class="social-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-.88-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                </svg>
+              </a>
+              <a href="#" class="social-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="copyright">© 2023 Kuma. 保留所有权利。</div>
+        <div class="footer-links">
+          <a href="#">GitHub</a>
+          <a href="#">Twitter</a>
+          <a href="#">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  
+  <script>
+    // 页面模块切换功能
+    let currentSection = 0;
+    const sections = document.querySelectorAll('.section');
+    const navLinks = document.querySelectorAll('.nav-link');
+    let isScrolling = false;
+    
+    // 切换到指定模块
+    function switchToSection(index) {
+      if (index < 0 || index >= sections.length) return;
+      
+      // 移除所有活跃状态
+      sections.forEach(section => section.classList.remove('active'));
+      navLinks.forEach(link => link.classList.remove('active'));
+      
+      // 添加新的活跃状态
+      sections[index].classList.add('active');
+      navLinks[index].classList.add('active');
+      
+      // 滚动到对应位置
+      sections[index].scrollIntoView({ behavior: 'smooth' });
+      
+      currentSection = index;
+    }
+    
+    // 滚轮事件处理
+    function handleWheel(event) {
+      event.preventDefault();
+      
+      if (isScrolling) return;
+      
+      isScrolling = true;
+      
+      if (event.deltaY > 0) {
+        // 向下滚动
+        if (currentSection < sections.length - 1) {
+          switchToSection(currentSection + 1);
+        }
+      } else {
+        // 向上滚动
+        if (currentSection > 0) {
+          switchToSection(currentSection - 1);
+        }
+      }
+      
+      // 防抖处理
+      setTimeout(() => {
+        isScrolling = false;
+      }, 1000);
+    }
+    
+    // 导航链接点击事件
+    navLinks.forEach((link, index) => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        switchToSection(index);
+      });
+    });
+    
+    // 添加滚轮事件监听
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    
+    // 博客轮播功能将在DOMContentLoaded中初始化
+    let animateBlogCards;
+    
+    // 监听模块切换，当切换到随记模块时触发动画
+    function handleSectionChange(index) {
+      if (index === 1) { // 随记模块是第2个模块（索引为1）
+        setTimeout(() => {
+          if (animateBlogCards) {
+            animateBlogCards();
+          }
+        }, 300);
+      }
+    }
+    
+    // 修改switchToSection函数以支持动画回调
+    const originalSwitchToSection = switchToSection;
+    switchToSection = function(index) {
+      originalSwitchToSection(index);
+      handleSectionChange(index);
+    };
+    
+    // Kuma logo点击刷新到首页功能
+    function refreshToHome() {
+      // 直接刷新页面，与cmd+r行为保持一致
+      location.reload();
+    }
+    
+    // 延迟动画控制
+    let hasUserInteracted = false;
+    let animationTriggered = false;
+    
+    // 触发所有动画
+    function triggerAnimations() {
+      if (animationTriggered) {
+        console.log('动画已经触发过了，跳过');
+        return;
+      }
+      animationTriggered = true;
+      console.log('开始触发动画');
+      
+      // 显示遮罩层和滚动指示器
+      const videoOverlay = document.querySelector('.video-overlay');
+      const scrollIndicator = document.querySelector('.scroll-indicator');
+      
+      if (videoOverlay) {
+        videoOverlay.classList.add('show');
+        console.log('视频遮罩层已显示');
+      } else {
+        console.log('未找到视频遮罩层元素');
+      }
+      
+      if (scrollIndicator) {
+        scrollIndicator.classList.add('show');
+        console.log('滚动指示器已显示');
+      } else {
+        console.log('未找到滚动指示器元素');
+      }
+      
+      // 触发文字动画
+      const fadeInTexts = document.querySelectorAll('.fade-in-text');
+      console.log('找到', fadeInTexts.length, '个文字动画元素');
+      fadeInTexts.forEach((text, index) => {
+        text.style.animationPlayState = 'running';
+        console.log('文字动画', index + 1, '已启动');
+      });
+    }
+    
+    // 监听用户交互
+    function handleUserInteraction() {
+      if (!hasUserInteracted) {
+        hasUserInteracted = true;
+        triggerAnimations();
+      }
+    }
+    
+    // 页面加载完成后的初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      // 页面刷新时重定位至页面最上方
+      window.scrollTo(0, 0);
+      
+      // 重置所有动画状态，确保刷新效果一致
+      hasUserInteracted = false;
+      animationTriggered = false;
+      
+      // 重置动画元素状态
+      const fadeInTexts = document.querySelectorAll('.fade-in-text');
+      fadeInTexts.forEach(text => {
+        text.style.animationPlayState = 'paused';
+      });
+      
+      const videoOverlay = document.querySelector('.video-overlay');
+      const scrollIndicator = document.querySelector('.scroll-indicator');
+      if (videoOverlay) videoOverlay.classList.remove('show');
+      if (scrollIndicator) scrollIndicator.classList.remove('show');
+      
+      // 延迟触发动画，确保页面刷新后动画正常显示
+      setTimeout(() => {
+        console.log('准备触发动画...');
+        triggerAnimations();
+        console.log('动画已触发');
+      }, 500);
+      
+      // 确保首页模块处于活跃状态
+      currentSection = 0;
+      sections.forEach((section, index) => {
+        if (index === 0) {
+          section.classList.add('active');
+        } else {
+          section.classList.remove('active');
+        }
+      });
+      navLinks.forEach((link, index) => {
+        if (index === 0) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+      
+      // 确保背景GIF正确显示
+      const gifBackground = document.getElementById('gif-background');
+      const videoBackground = document.querySelector('.video-background');
+      if (gifBackground && videoBackground) {
+        // 强制显示背景容器
+        videoBackground.style.display = 'block';
+        videoBackground.style.visibility = 'visible';
+        videoBackground.style.zIndex = '-1';
+        videoBackground.style.position = 'fixed';
+        
+        // 确保GIF图片正确加载和显示
+        gifBackground.style.display = 'block';
+        gifBackground.style.visibility = 'visible';
+        gifBackground.style.opacity = '1';
+        
+        // 强制重新加载GIF，绕过浏览器缓存
+        // const originalSrc = gifBackground.src;
+        // const timestamp = new Date().getTime();
+        // gifBackground.src = originalSrc + '?t=' + timestamp;
+        
+        // 如果GIF还未加载完成，等待加载
+        if (!gifBackground.complete) {
+          gifBackground.onload = function() {
+            console.log('背景GIF加载完成');
+          };
+          gifBackground.onerror = function() {
+            console.error('背景GIF加载失败:', gifBackground.src);
+            // 如果加载失败，尝试使用原始路径
+            gifBackground.src = originalSrc;
+          };
+        }
+      }
+      
+      // 博客轮播功能
+      let currentBlogIndex = 0;
+      const blogCards = document.querySelectorAll('.blog-card');
+      const blogTrack = document.querySelector('.blog-track');
+      const prevBtn = document.querySelector('.blog-prev');
+      const nextBtn = document.querySelector('.blog-next');
+      const cardsPerView = 5;
+      const maxIndex = Math.max(0, blogCards.length - cardsPerView);
+      let isFirstLoad = true; // 添加首次加载标志
+      
+      function updateBlogCarousel() {
+        const cardWidth = (100 / blogCards.length);
+        let translateX;
+        
+        // 当到达最后一个位置时，确保最后一个卡片与右边缘对齐
+        if (currentBlogIndex >= maxIndex) {
+          // 计算使最后一个卡片右对齐的位移
+          const totalWidth = blogCards.length * cardWidth;
+          translateX = -(totalWidth - 100);
+        } else {
+          translateX = -(currentBlogIndex * cardWidth);
+        }
+        
+        blogTrack.style.transform = `translateX(${translateX}%)`;
+        
+        // 更新按钮状态
+        prevBtn.disabled = currentBlogIndex === 0;
+        nextBtn.disabled = currentBlogIndex >= maxIndex;
+      }
+      
+      animateBlogCards = function() {
+        // 只在首次加载时执行动画
+        if (isFirstLoad) {
+          blogCards.forEach((card, index) => {
+            card.classList.remove('animate-in');
+            setTimeout(() => {
+              if (index >= currentBlogIndex && index < currentBlogIndex + cardsPerView) {
+                card.classList.add('animate-in');
+              }
+            }, (index - currentBlogIndex) * 150);
+          });
+          isFirstLoad = false; // 标记为已加载
+        }
+      }
+      
+      if (prevBtn && nextBtn) {
+        // 添加点击事件
+        prevBtn.addEventListener('click', () => {
+          if (currentBlogIndex > 0) {
+            currentBlogIndex--;
+            updateBlogCarousel();
+            // 移除动画调用，只在首次加载时生效
+            // 添加点击反馈
+            prevBtn.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+              prevBtn.style.transform = '';
+            }, 150);
+          }
+        });
+        
+        nextBtn.addEventListener('click', () => {
+          if (currentBlogIndex < maxIndex) {
+            currentBlogIndex++;
+            updateBlogCarousel();
+            // 移除动画调用，只在首次加载时生效
+            // 添加点击反馈
+            nextBtn.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+              nextBtn.style.transform = '';
+            }, 150);
+          }
+        });
+        
+        // 添加键盘支持
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowLeft' && currentBlogIndex > 0) {
+            currentBlogIndex--;
+            updateBlogCarousel();
+            // 移除动画调用，只在首次加载时生效
+          } else if (e.key === 'ArrowRight' && currentBlogIndex < maxIndex) {
+            currentBlogIndex++;
+            updateBlogCarousel();
+            // 移除动画调用，只在首次加载时生效
+          }
+        });
+      }
+      
+      // 初始化博客轮播
+      updateBlogCarousel();
+      // 初始化博客卡片动画
+      animateBlogCards();
+      
+      // 添加用户交互监听器
+      document.addEventListener('click', handleUserInteraction);
+      document.addEventListener('keydown', handleUserInteraction);
+      document.addEventListener('scroll', handleUserInteraction);
+      document.addEventListener('wheel', handleUserInteraction);
+      document.addEventListener('touchstart', handleUserInteraction);
+      
+      // 如果没有用户交互，5秒后自动触发动画（等待背景GIF首次播放完成）
+      setTimeout(() => {
+        if (!hasUserInteracted) {
+          triggerAnimations();
+        }
+      }, 5000);
+    });
+    
+    // 浮层卡片功能
+    function openCardModal(cardIndex) {
+      const modal = document.getElementById('cardModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalCategory = document.getElementById('modalCategory');
+      const modalDescription = document.getElementById('modalDescription');
+      
+      // 卡片数据
+      const cardData = [
+        {
+          category: '生活',
+          title: '有趣的都能做',
+          description: '探索生活中的美好瞬间，记录那些让人会心一笑的小确幸。在这个快节奏的世界里，我们常常忽略了身边的美好。这里记录着那些平凡却珍贵的时刻，那些让生活变得有趣的小事情。'
+        },
+        {
+          category: '创作',
+          title: '对故事的创作欲',
+          description: '分享创作过程中的灵感来源和技术实现，记录每一次突破。创作是一个充满挑战和惊喜的过程，从最初的想法到最终的作品，每一步都充满了可能性。这里分享创作的心路历程和技术探索。'
+        },
+        {
+          category: '学习',
+          title: '简单都能当老师',
+          description: '将复杂的概念用简单的方式表达，让学习变得更加有趣。教学相长，在分享知识的过程中，我们也在不断学习和成长。这里记录着学习的心得和教学的感悟。'
+        },
+        {
+          category: '娱乐',
+          title: '休闲玩乐，乐不停',
+          description: '生活不只有工作，还有诗和远方，记录那些快乐时光。娱乐是生活的调味剂，让我们在忙碌的工作之余找到放松和快乐。这里分享那些有趣的娱乐体验和快乐时光。'
+        }
+      ];
+      
+      const data = cardData[cardIndex];
+      modalCategory.textContent = data.category;
+      modalTitle.textContent = data.title;
+      modalDescription.textContent = data.description;
+      
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      
+      // 添加动画效果
+      setTimeout(() => {
+        modal.classList.add('show');
+      }, 10);
+    }
+    
+    function closeCardModal() {
+      const modal = document.getElementById('cardModal');
+      modal.classList.remove('show');
+      
+      setTimeout(() => {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+      }, 300);
+    }
+  </script>
+  
+  <!-- 浮层卡片模态框 -->
+  <div id="cardModal" class="card-modal">
+    <div class="modal-backdrop" onclick="closeCardModal()"></div>
+    <div class="modal-card">
+      <button class="modal-close-btn" onclick="closeCardModal()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="modal-content">
+        <div class="modal-category" id="modalCategory">分类</div>
+        <h2 class="modal-title" id="modalTitle">标题</h2>
+        <p class="modal-description" id="modalDescription">描述内容</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

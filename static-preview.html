@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kuma - 个人网站</title>
+  <style>
+    :root {
+      --color-primary-light: #3b82f6;
+      --color-primary-dark: #60a5fa;
+      --color-text-light: #1f2937;
+      --color-text-dark: #f9fafb;
+      --color-bg-light: #ffffff;
+      --color-bg-dark: #111827;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: var(--color-text-light);
+      background-color: var(--color-bg-light);
+      transition: background-color 0.3s, color 0.3s;
+      overflow-x: hidden;
+      overscroll-behavior: none;
+    }
+    
+    .dark {
+      color: var(--color-text-dark);
+      background-color: var(--color-bg-dark);
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    header {
+      padding: 1rem 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-primary-light);
+    }
+    
+    .dark .logo {
+      color: var(--color-primary-dark);
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+    
+    .nav-links a {
+      text-decoration: none;
+      color: white;
+      font-weight: 300;
+      transition: color 0.3s;
+      position: relative;
+    }
+    
+    .nav-links a:hover {
+      color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .nav-link.active {
+      color: white;
+      font-weight: 600;
+    }
+    
+
+    
+    main {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .video-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+    }
+    
+    .video-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: transparent;
+      opacity: 0;
+      transition: opacity 1s ease, background-color 1s ease;
+    }
+    
+    .video-overlay.show {
+      background-color: rgba(0, 0, 0, 0.75);
+    }
+    
+    .dark .video-overlay.show {
+      background-color: rgba(0, 0, 0, 0.85);
+    }
+    
+    /* 模块样式 */
+    .section {
+      height: 56.25vw; /* 根据562x316比例计算的高度 */
+      max-height: 100vh;
+      min-height: 500px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      padding-top: 80px; /* 导航栏安全区域 */
+    }
+    
+    /* 随记模块背景 */
+    #blog {
+      background-image: url('/Users/ppn/Desktop/trae/个站材料/bg2.gif');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    
+    /* 关于模块背景 */
+    #about {
+      background-image: url('/Users/ppn/Desktop/trae/个站材料/bg3.gif');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    
+    .section.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    /* 确保首页模块默认可见 */
+    .section#home {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      height: calc(100% - 80px); /* 减去导航栏安全区域高度 */
+      position: relative;
+      padding: 0 2rem;
+    }
+    
+    .hero-content {
+      max-width: 800px;
+      margin: 0 auto;
+      z-index: 2;
+      padding: 2rem 0;
+    }
+    
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #ffffff;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    
+    .hero p {
+      font-size: 1.25rem;
+      color: #f3f4f6;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    }
+    
+    /* 文字缓进动效 */
+    .fade-in-text {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 1s ease forwards;
+      animation-play-state: paused;
+    }
+    
+    .fade-in-text:nth-child(2) {
+      animation-delay: 0.3s;
+    }
+    
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* 滚动指示器样式 */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+    
+    /* 初始隐藏遮罩层样式已合并到上方 */
+    
+    /* 显示状态 */
+    .video-overlay.show {
+      opacity: 1;
+    }
+    
+    .scroll-indicator.show {
+      opacity: 1;
+    }
+    
+    .mouse-icon {
+      margin-bottom: 10px;
+    }
+    
+    .arrow-down {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5px;
+      animation: bounce 2.5s infinite;
+    }
+    
+    @keyframes bounce {
+      0% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(15px);
+        opacity: 0;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background-color: var(--color-primary-light);
+      color: white;
+      text-decoration: none;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+    
+    .btn:hover {
+      background-color: #2563eb;
+      transform: translateY(-2px);
+    }
+    
+    .dark .btn {
+      background-color: var(--color-primary-dark);
+    }
+    
+    .dark .btn:hover {
+      background-color: #3b82f6;
+    }
+    
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 3rem;
+      margin-top: 2rem;
+      color: var(--color-text-light);
+    }
+    
+    .dark .section-title {
+      color: var(--color-text-dark);
+    }
+    
+    .article-grid {
+       display: grid;
+       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+       gap: 2rem;
+       padding-top: 1rem;
+     }
+     
+     .blog-title {
+        position: absolute;
+        top: 90px;
+        left: 50px;
+        font-size: 2rem;
+        font-weight: bold;
+        color: #1f2937;
+        z-index: 30;
+        margin: 0;
+        padding: 0.5rem 0;
+      }
+     
+     .dark .blog-title {
+       color: #f9fafb;
+     }
+     
+     .blog-container {
+      position: relative;
+      width: 100%;
+      height: auto;
+      min-height: 1100px;
+      overflow: hidden;
+      padding-top: 180px;
+      padding-bottom: 8rem;
+      display: flex;
+      align-items: center;
+    }
+    
+
+     
+     .blog-carousel {
+       width: calc(100% + 60vw);
+       height: 100%;
+       position: relative;
+       margin-left: 0;
+     }
+     
+     .blog-track {
+       display: flex;
+       width: calc(100% + 40vw);
+       height: 100%;
+       transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+       margin-left: 0;
+     }
+     
+     .blog-card {
+         flex: 0 0 calc((100vw - 40px) / 4.5);
+         height: 100%;
+         margin-right: 1.2rem;
+         opacity: 0;
+         transform: translateY(50px) scale(0.9);
+         transition: all 3s cubic-bezier(0.4, 0, 0.2, 1);
+         transform-origin: center;
+       }
+      
+      .blog-card:hover {
+      transform: scale(1.01) !important;
+      z-index: 10;
+    }
+     
+     .blog-card:nth-child(n) {
+       transform: translateY(50px) scale(1);
+     }
+     
+     .blog-card.animate-in {
+       opacity: 1;
+       transform: translateY(0) scale(0.9);
+     }
+     
+     .blog-card.animate-in:nth-child(n) {
+       transform: translateY(0) scale(1);
+     }
+     
+     .blog-controls {
+        position: absolute;
+        bottom: 50px;
+        right: calc((100vw - 1200px) / 2 + 20px);
+        display: flex;
+        gap: 0.5rem;
+        z-index: 30;
+      }
+      
+      @media (max-width: 1240px) {
+        .blog-controls {
+          right: 20px;
+        }
+      }
+     
+     .blog-nav-btn {
+       width: 48px;
+       height: 48px;
+       border-radius: 50%;
+       background: rgba(255, 255, 255, 0.9);
+       border: none;
+       cursor: pointer;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       transition: all 0.3s ease;
+       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+       backdrop-filter: blur(10px);
+     }
+     
+     .blog-nav-btn:hover {
+       background: rgba(255, 255, 255, 1);
+       transform: scale(1.1);
+       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+     }
+     
+     .blog-nav-btn:active {
+       transform: scale(0.95);
+     }
+     
+     .blog-nav-btn svg {
+       color: #374151;
+     }
+     
+     .blog-nav-btn:disabled {
+       opacity: 0.5;
+       cursor: not-allowed;
+       transform: none;
+     }
+     
+     .blog-nav-btn:disabled:hover {
+      background: rgba(255, 255, 255, 0.9);
+      transform: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* 卡片展开按钮样式 */
+    .card-expand-btn {
+      position: absolute;
+      bottom: 15px;
+      right: 15px;
+      width: 36px;
+      height: 36px;
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 10;
+      color: #333;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    .card-expand-btn:hover {
+      background: rgba(255, 255, 255, 1);
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .card-expand-btn svg {
+      transition: transform 0.3s ease;
+    }
+    
+    .card-expand-btn:hover svg {
+      transform: rotate(90deg);
+    }
+    
+    /* 浮层卡片模态框样式 */
+    .card-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .card-modal.show {
+      opacity: 1;
+    }
+    
+    .modal-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    
+    .modal-card {
+      position: relative;
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      transform: scale(0.9) translateY(20px);
+      transition: transform 0.3s ease;
+      z-index: 1001;
+    }
+    
+    .card-modal.show .modal-card {
+      transform: scale(1) translateY(0);
+    }
+    
+    .modal-close-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      width: 40px;
+      height: 40px;
+      background: rgba(0, 0, 0, 0.1);
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: #666;
+    }
+    
+    .modal-close-btn:hover {
+      background: rgba(0, 0, 0, 0.2);
+      transform: scale(1.1);
+      color: #333;
+    }
+    
+    .modal-content {
+      padding-top: 1rem;
+    }
+    
+    .modal-category {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+    }
+    
+    .modal-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 1rem;
+      line-height: 1.3;
+    }
+    
+    .modal-description {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #666;
+      margin: 0;
+    }
+    
+    /* 暗色模式下的浮层样式 */
+    .dark .modal-card {
+      background: #1a1a1a;
+      color: white;
+    }
+    
+    .dark .modal-title {
+      color: white;
+    }
+    
+    .dark .modal-description {
+      color: #ccc;
+    }
+    
+    .dark .modal-close-btn {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ccc;
+    }
+    
+    .dark .modal-close-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+      .blog-controls {
+        bottom: 40px;
+        right: 40px;
+      }
+      
+      .blog-nav-btn {
+        width: 40px;
+        height: 40px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .blog-controls {
+        bottom: 20px;
+        right: 20px;
+      }
+      
+      .blog-nav-btn {
+        width: 36px;
+        height: 36px;
+      }
+    }
+    
+
+    
+    /* 关于页面样式 */
+    .about-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+      padding-top: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+      .about-content {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .about-text h3 {
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      color: var(--color-primary-light);
+    }
+    
+    .dark .about-text h3 {
+      color: var(--color-primary-dark);
+    }
+    
+    .about-text:first-child h3:first-child {
+      margin-top: 0;
+    }
+    
+    .about-text ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    
+    .about-text li {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    
+    .dark .about-text li {
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .about-image {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    #blog .article-card {
+      border-radius: 1.5rem;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      background-color: white;
+      height: calc(100vw / 3.8 + 200px - 70px);
+    }
+    
+    #blog .modern-card {
+      position: relative;
+      cursor: pointer;
+    }
+    
+    #blog .modern-card:hover {
+      transform: translateY(-8px) scale(1.01);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    
+    #blog .card-background {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      border-radius: 1.5rem;
+      overflow: hidden;
+    }
+    
+    #blog .card-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 100%);
+    }
+    
+    #blog .card-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 2rem;
+      color: white;
+      z-index: 2;
+    }
+    
+    #blog .card-category {
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+      opacity: 0.9;
+    }
+    
+    #blog .card-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 0 0.75rem 0;
+      line-height: 1.3;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    #blog .card-description {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin: 0;
+      opacity: 0.95;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+    
+    .article-image {
+      width: 100%;
+      height: 200px;
+      background-color: #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .dark .article-image {
+      background-color: #374151;
+    }
+    
+    .article-content {
+      padding: 1.5rem;
+    }
+    
+    .article-content h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--color-text-light);
+    }
+    
+    .dark .article-content h3 {
+      color: var(--color-text-dark);
+    }
+    
+    .article-content p {
+      color: #6b7280;
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+    
+    .dark .article-content p {
+      color: #9ca3af;
+    }
+    
+    .article-meta {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.875rem;
+      color: #9ca3af;
+    }
+    
+    .dark .article-meta {
+      color: #6b7280;
+    }
+    
+    footer {
+      background-color: #f9fafb;
+      padding: 3rem 0;
+      margin-top: 4rem;
+      text-align: center;
+      color: #6b7280;
+    }
+    
+    .dark footer {
+      background-color: #1f2937;
+      color: #9ca3af;
+    }
+    
+    /* 关于页面样式 */
+    .about-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    
+    @media (max-width: 768px) {
+      .about-grid {
+        gap: 2rem;
+      }
+    }
+    
+    .about-left {
+      text-align: center;
+    }
+    
+    .about-right {
+      text-align: center;
+    }
+    
+    .section-title-left {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 2rem;
+      text-align: left;
+      color: #1f2937;
+    }
+    
+    .dark .section-title-left {
+      color: #f9fafb;
+    }
+    
+    .about-section {
+      margin-bottom: 2rem;
+    }
+    
+    .about-subtitle {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      text-align: left;
+      color: #1f2937;
+    }
+    
+    .dark .about-subtitle {
+      color: #f9fafb;
+    }
+    
+    .about-text {
+      font-size: 1.125rem;
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+      text-align: left;
+      color: #4b5563;
+    }
+    
+    .dark .about-text {
+      color: #d1d5db;
+    }
+    
+    .skills-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 0;
+    }
+    
+    .skills-two-column {
+      display: flex;
+      gap: 2rem;
+      align-items: flex-start;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .skills-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .skills-divider {
+      width: 1px;
+      background-color: #e5e7eb;
+      min-height: 200px;
+    }
+    
+    .dark .skills-divider {
+      background-color: #374151;
+    }
+    
+    @media (max-width: 768px) {
+      .skills-two-column {
+        flex-direction: column;
+        gap: 2rem;
+      }
+      
+      .skills-divider {
+        width: 100%;
+        height: 1px;
+        min-height: 1px;
+      }
+    }
+    
+    .skill-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .skill-name {
+      font-weight: 600;
+      color: #1f2937;
+      font-size: 1.125rem;
+    }
+    
+    .dark .skill-name {
+      color: #f9fafb;
+    }
+    
+    .skill-description {
+      font-size: 0.875rem;
+      color: #6b7280;
+      line-height: 1.5;
+    }
+    
+    .dark .skill-description {
+      color: #9ca3af;
+    }
+    
+    .contact-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 2rem;
+      text-align: left;
+      color: #1f2937;
+    }
+    
+    .dark .contact-title {
+      color: #f9fafb;
+    }
+    
+    .social-links-icons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      justify-content: flex-start;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    @media (max-width: 480px) {
+      .social-links-icons {
+        justify-content: flex-start;
+        gap: 1rem;
+      }
+    }
+    
+    .social-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      opacity: 0.8;
+    }
+    
+    .social-icon:hover {
+      opacity: 1;
+      transform: translateY(-2px) scale(1.1);
+    }
+    
+    .social-icon svg {
+      filter: invert(0);
+      fill: white;
+      transition: all 0.3s ease;
+    }
+    
+    .social-icon:hover svg {
+      filter: invert(0) brightness(1.2);
+      fill: #f0f0f0;
+    }
+    
+    .dark .social-icon svg {
+      filter: invert(0);
+      fill: white;
+    }
+    
+    .dark .social-icon:hover svg {
+      filter: invert(0) brightness(1.2);
+      fill: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <div class="logo" onclick="refreshToHome()" style="cursor: pointer;">Kuma</div>
+        <div class="nav-links">
+          <a href="#home" class="nav-link active" data-section="home">首页</a>
+          <a href="#blog" class="nav-link" data-section="blog">随记</a>
+          <a href="#about" class="nav-link" data-section="about">关于</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+  
+  <main>
+    <!-- 首页模块 -->
+    <section id="home" class="section active">
+      <div class="video-background">
+        <img src="public/images/22.gif" id="gif-background" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; display: block; z-index: 1;">
+        <div class="video-overlay" style="z-index: 2;"></div>
+      </div>
+      <div class="container">
+        <div class="hero">
+          <div class="hero-content">
+            <h1 class="fade-in-text">你好，我是Kuma</h1>
+            <p class="fade-in-text">我是一名前端开发者，热爱设计和创造。这个网站展示了我的作品和想法，希望能给您带来一些灵感。</p>
+          </div>
+        </div>
+        <!-- 鼠标和箭头图标 -->
+        <div class="scroll-indicator">
+          <div class="mouse-icon">
+            <svg width="18" height="30" viewBox="0 0 18 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="1" y="1" width="16" height="28" rx="8" stroke="white" stroke-width="1" fill="none"/>
+              <circle cx="9" cy="8" r="1.5" fill="white"/>
+            </svg>
+          </div>
+          <div class="arrow-down">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 7L9 11L13 7" stroke="white" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 7L9 11L13 7" stroke="white" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 随记模块 -->
+    <section id="blog" class="section">
+      <div class="container">
+        <div class="blog-container">
+          <h2 class="blog-title">随记</h2>
+            <div class="blog-carousel">
+              <div class="blog-track">
+                <article class="article-card modern-card blog-card" data-index="0">
+                  <div class="card-background" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="card-overlay"></div>
+                    <div class="card-content">
+                      <div class="card-category">生活</div>
+                      <h3 class="card-title">有趣的都能做</h3>
+                      <p class="card-description">探索生活中的美好瞬间，记录那些让人会心一笑的小确幸...</p>
+                      <button class="card-expand-btn" onclick="openCardModal(0)">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="article-card modern-card blog-card" data-index="1">
+                  <div class="card-background" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <div class="card-overlay"></div>
+                    <div class="card-content">
+                      <div class="card-category">创作</div>
+                      <h3 class="card-title">对故事的创作欲</h3>
+                      <p class="card-description">分享创作过程中的灵感来源和技术实现，记录每一次突破...</p>
+                      <button class="card-expand-btn" onclick="openCardModal(1)">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="article-card modern-card blog-card" data-index="2">
+                  <div class="card-background" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <div class="card-overlay"></div>
+                    <div class="card-content">
+                      <div class="card-category">学习</div>
+                      <h3 class="card-title">简单都能当老师</h3>
+                      <p class="card-description">将复杂的概念用简单的方式表达，让学习变得更加有趣...</p>
+                      <button class="card-expand-btn" onclick="openCardModal(2)">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="article-card modern-card blog-card" data-index="3">
+                  <div class="card-background" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                    <div class="card-overlay"></div>
+                    <div class="card-content">
+                      <div class="card-category">娱乐</div>
+                      <h3 class="card-title">休闲玩乐，乐不停</h3>
+                      <p class="card-description">生活不只有工作，还有诗和远方，记录那些快乐时光...</p>
+                      <button class="card-expand-btn" onclick="openCardModal(3)">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="article-card modern-card blog-card" data-index="4">
+                  <div class="card-background" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                    <div class="card-overlay"></div>
+                    <div class="card-content">
+                      <div class="card-category">思考</div>
+                      <h3 class="card-title">深度思考录</h3>
+                      <p class="card-description">记录那些深夜的思考，关于人生、技术和未来的哲学思辨...</p>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="article-card modern-card blog-card" data-index="5">
+                  <div class="card-background" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
+                    <div class="card-overlay"></div>
+                    <div class="card-content">
+                      <div class="card-category">旅行</div>
+                      <h3 class="card-title">行走的意义</h3>
+                      <p class="card-description">用脚步丈量世界，用心感受不同文化带来的震撼和启发...</p>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="article-card modern-card blog-card" data-index="6">
+                  <div class="card-background" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">
+                    <div class="card-overlay"></div>
+                    <div class="card-content">
+                      <div class="card-category">创意</div>
+                      <h3 class="card-title">创意无限</h3>
+                      <p class="card-description">灵感来源于生活的每一个细节，记录那些突如其来的创意火花...</p>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="article-card modern-card blog-card" data-index="7">
+                  <div class="card-background" style="background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);">
+                    <div class="card-overlay"></div>
+                    <div class="card-content">
+                      <div class="card-category">感悟</div>
+                      <h3 class="card-title">人生感悟</h3>
+                      <p class="card-description">在人生的路上，每一次经历都是成长，记录那些珍贵的感悟时刻...</p>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="article-card modern-card blog-card" data-index="8">
+                  <div class="card-background" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="card-overlay"></div>
+                    <div class="card-content">
+                      <div class="card-category">技术</div>
+                      <h3 class="card-title">技术探索</h3>
+                      <p class="card-description">深入探索前沿技术，分享开发过程中的心得体会和技术感悟...</p>
+                    </div>
+                  </div>
+                </article>
+                
+                <article class="article-card modern-card blog-card" data-index="9">
+                  <div class="card-background" style="background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);">
+                    <div class="card-overlay"></div>
+                    <div class="card-content">
+                      <div class="card-category">分享</div>
+                      <h3 class="card-title">知识分享</h3>
+                      <p class="card-description">将学到的知识整理分享，帮助更多人在学习路上少走弯路...</p>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </div>
+            
+          </div>
+          
+          <div class="blog-controls">
+            <button class="blog-nav-btn blog-prev" aria-label="上一页">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <button class="blog-nav-btn blog-next" aria-label="下一页">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+
+    <!-- 关于模块 -->
+    <section id="about" class="section">
+      <div class="container">
+        <div class="about-content">
+          <div class="about-text" style="max-width: 800px; margin: 0 auto; text-align: center;">
+            <h3>个人简介</h3>
+            <p>我是一名专注于用户体验设计和产品开发的设计师，拥有丰富的前端开发和设计工具使用经验。热衷于创造直观、美观且功能强大的数字产品，致力于通过设计和技术的结合为用户带来卓越的体验。</p>
+            <h3>专业技能</h3>
+            <div class="skills-two-column">
+               <div class="skills-column">
+                 <div class="skill-item">
+                   <span class="skill-name">前端开发</span>
+                   <span class="skill-description">精通HTML、CSS、JavaScript，熟悉React、Vue等现代框架</span>
+                 </div>
+                 <div class="skill-item">
+                   <span class="skill-name">UI/UX设计</span>
+                   <span class="skill-description">专业的用户界面和用户体验设计，注重用户需求和视觉美感</span>
+                 </div>
+                 <div class="skill-item">
+                   <span class="skill-name">设计工具</span>
+                   <span class="skill-description">熟练使用Figma、Sketch、Adobe系列等专业设计软件</span>
+                 </div>
+               </div>
+               <div class="skills-divider"></div>
+               <div class="skills-column">
+                 <div class="skill-item">
+                   <span class="skill-name">原型制作</span>
+                   <span class="skill-description">擅长使用Axure、Figma等工具制作交互原型和高保真设计稿</span>
+                 </div>
+                 <div class="skill-item">
+                   <span class="skill-name">AI工具</span>
+                   <span class="skill-description">熟练运用Cursor、ChatGPT等AI辅助工具提升工作效率</span>
+                 </div>
+                 <div class="skill-item">
+                   <span class="skill-name">产品思维</span>
+                   <span class="skill-description">具备产品设计思维，能够从用户角度思考产品功能和体验</span>
+                 </div>
+               </div>
+             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <footer>
+    <div class="container">
+      <p>&copy; 2024 Kuma. 保留所有权利。</p>
+    </div>
+  </footer>
+  
+  <script>
+    // 页面模块切换功能
+    let currentSection = 0;
+    const sections = document.querySelectorAll('.section');
+    const navLinks = document.querySelectorAll('.nav-link');
+    let isScrolling = false;
+    
+    // 切换到指定模块
+    function switchToSection(index) {
+      if (index < 0 || index >= sections.length) return;
+      
+      // 移除所有活跃状态
+      sections.forEach(section => section.classList.remove('active'));
+      navLinks.forEach(link => link.classList.remove('active'));
+      
+      // 添加新的活跃状态
+      sections[index].classList.add('active');
+      navLinks[index].classList.add('active');
+      
+      // 滚动到对应位置
+      sections[index].scrollIntoView({ behavior: 'smooth' });
+      
+      currentSection = index;
+    }
+    
+    // 滚轮事件处理
+    function handleWheel(event) {
+      event.preventDefault();
+      
+      if (isScrolling) return;
+      
+      isScrolling = true;
+      
+      if (event.deltaY > 0) {
+        // 向下滚动
+        if (currentSection < sections.length - 1) {
+          switchToSection(currentSection + 1);
+        }
+      } else {
+        // 向上滚动
+        if (currentSection > 0) {
+          switchToSection(currentSection - 1);
+        }
+      }
+      
+      // 防抖处理
+      setTimeout(() => {
+        isScrolling = false;
+      }, 1000);
+    }
+    
+    // 导航链接点击事件
+    navLinks.forEach((link, index) => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        switchToSection(index);
+      });
+    });
+    
+    // 添加滚轮事件监听
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    
+    // Kuma logo点击刷新到首页功能
+    function refreshToHome() {
+      // 直接刷新页面，与cmd+r行为保持一致
+      location.reload();
+    }
+    
+    // 延迟动画控制
+    let hasUserInteracted = false;
+    let animationTriggered = false;
+    
+    // 触发所有动画
+    function triggerAnimations() {
+      if (animationTriggered) {
+        console.log('动画已经触发过了，跳过');
+        return;
+      }
+      animationTriggered = true;
+      console.log('开始触发动画');
+      
+      // 显示遮罩层和滚动指示器
+      const videoOverlay = document.querySelector('.video-overlay');
+      const scrollIndicator = document.querySelector('.scroll-indicator');
+      
+      if (videoOverlay) {
+        videoOverlay.classList.add('show');
+        console.log('视频遮罩层已显示');
+      } else {
+        console.log('未找到视频遮罩层元素');
+      }
+      
+      if (scrollIndicator) {
+        scrollIndicator.classList.add('show');
+        console.log('滚动指示器已显示');
+      } else {
+        console.log('未找到滚动指示器元素');
+      }
+      
+      // 触发文字动画
+      const fadeInTexts = document.querySelectorAll('.fade-in-text');
+      console.log('找到', fadeInTexts.length, '个文字动画元素');
+      fadeInTexts.forEach((text, index) => {
+        text.style.animationPlayState = 'running';
+        console.log('文字动画', index + 1, '已启动');
+      });
+    }
+    
+    // 监听用户交互
+    function handleUserInteraction() {
+      if (!hasUserInteracted) {
+        hasUserInteracted = true;
+        triggerAnimations();
+      }
+    }
+    
+    // 页面加载完成后的初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      // 页面刷新时重定位至页面最上方
+      window.scrollTo(0, 0);
+      
+      // 重置所有动画状态，确保刷新效果一致
+      hasUserInteracted = false;
+      animationTriggered = false;
+      
+      // 重置动画元素状态
+      const fadeInTexts = document.querySelectorAll('.fade-in-text');
+      fadeInTexts.forEach(text => {
+        text.style.animationPlayState = 'paused';
+      });
+      
+      const videoOverlay = document.querySelector('.video-overlay');
+      const scrollIndicator = document.querySelector('.scroll-indicator');
+      if (videoOverlay) videoOverlay.classList.remove('show');
+      if (scrollIndicator) scrollIndicator.classList.remove('show');
+      
+      // 延迟触发动画，确保页面刷新后动画正常显示
+      setTimeout(() => {
+        console.log('准备触发动画...');
+        triggerAnimations();
+        console.log('动画已触发');
+      }, 500);
+      
+      // 确保首页模块处于活跃状态
+      currentSection = 0;
+      sections.forEach((section, index) => {
+        if (index === 0) {
+          section.classList.add('active');
+        } else {
+          section.classList.remove('active');
+        }
+      });
+      navLinks.forEach((link, index) => {
+        if (index === 0) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+      
+      // 确保背景GIF正确显示
+      const gifBackground = document.getElementById('gif-background');
+      const videoBackground = document.querySelector('.video-background');
+      if (gifBackground && videoBackground) {
+        // 强制显示背景容器
+        videoBackground.style.display = 'block';
+        videoBackground.style.visibility = 'visible';
+        videoBackground.style.zIndex = '-1';
+        videoBackground.style.position = 'fixed';
+        
+        // 确保GIF图片正确加载和显示
+        gifBackground.style.display = 'block';
+        gifBackground.style.visibility = 'visible';
+        gifBackground.style.opacity = '1';
+        
+        // 强制重新加载GIF，绕过浏览器缓存
+        // const originalSrc = gifBackground.src;
+        // const timestamp = new Date().getTime();
+        // gifBackground.src = originalSrc + '?t=' + timestamp;
+        
+        // 如果GIF还未加载完成，等待加载
+        if (!gifBackground.complete) {
+          gifBackground.onload = function() {
+            console.log('背景GIF加载完成');
+          };
+          gifBackground.onerror = function() {
+            console.error('背景GIF加载失败:', gifBackground.src);
+            // 如果加载失败，尝试使用原始路径
+            gifBackground.src = originalSrc;
+          };
+        }
+      }
+      
+      // 博客轮播功能
+      let currentBlogIndex = 0;
+      const blogCards = document.querySelectorAll('.blog-card');
+      const blogTrack = document.querySelector('.blog-track');
+      const prevBtn = document.querySelector('.blog-prev');
+      const nextBtn = document.querySelector('.blog-next');
+      const cardsPerView = 5;
+      const maxIndex = Math.max(0, blogCards.length - cardsPerView);
+      let isFirstLoad = true; // 添加首次加载标志
+      
+      function updateBlogCarousel() {
+        const cardWidth = (100 / blogCards.length);
+        let translateX;
+        
+        // 当到达最后一个位置时，确保最后一个卡片与右边缘对齐
+        if (currentBlogIndex >= maxIndex) {
+          // 计算使最后一个卡片右对齐的位移
+          const totalWidth = blogCards.length * cardWidth;
+          translateX = -(totalWidth - 100);
+        } else {
+          translateX = -(currentBlogIndex * cardWidth);
+        }
+        
+        blogTrack.style.transform = `translateX(${translateX}%)`;
+        
+        // 更新按钮状态
+        prevBtn.disabled = currentBlogIndex === 0;
+        nextBtn.disabled = currentBlogIndex >= maxIndex;
+      }
+      
+      function animateBlogCards() {
+        // 只在首次加载时执行动画
+        if (isFirstLoad) {
+          blogCards.forEach((card, index) => {
+            card.classList.remove('animate-in');
+            setTimeout(() => {
+              if (index >= currentBlogIndex && index < currentBlogIndex + cardsPerView) {
+                card.classList.add('animate-in');
+              }
+            }, (index - currentBlogIndex) * 150);
+          });
+          isFirstLoad = false; // 标记为已加载
+        }
+      }
+      
+      if (prevBtn && nextBtn) {
+        // 添加点击事件
+        prevBtn.addEventListener('click', () => {
+          if (currentBlogIndex > 0) {
+            currentBlogIndex--;
+            updateBlogCarousel();
+            // 移除动画调用，只在首次加载时生效
+            // 添加点击反馈
+            prevBtn.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+              prevBtn.style.transform = '';
+            }, 150);
+          }
+        });
+        
+        nextBtn.addEventListener('click', () => {
+          if (currentBlogIndex < maxIndex) {
+            currentBlogIndex++;
+            updateBlogCarousel();
+            // 移除动画调用，只在首次加载时生效
+            // 添加点击反馈
+            nextBtn.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+              nextBtn.style.transform = '';
+            }, 150);
+          }
+        });
+        
+        // 添加键盘支持
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowLeft' && currentBlogIndex > 0) {
+            currentBlogIndex--;
+            updateBlogCarousel();
+            // 移除动画调用，只在首次加载时生效
+          } else if (e.key === 'ArrowRight' && currentBlogIndex < maxIndex) {
+            currentBlogIndex++;
+            updateBlogCarousel();
+            // 移除动画调用，只在首次加载时生效
+          }
+        });
+      }
+      
+      // 初始化博客轮播
+      updateBlogCarousel();
+      // 初始化博客卡片动画
+      animateBlogCards();
+      
+      // 添加用户交互监听器
+      document.addEventListener('click', handleUserInteraction);
+      document.addEventListener('keydown', handleUserInteraction);
+      document.addEventListener('scroll', handleUserInteraction);
+      document.addEventListener('wheel', handleUserInteraction);
+      document.addEventListener('touchstart', handleUserInteraction);
+      
+      // 如果没有用户交互，5秒后自动触发动画（等待背景GIF首次播放完成）
+      setTimeout(() => {
+        if (!hasUserInteracted) {
+          triggerAnimations();
+        }
+      }, 5000);
+    });
+    
+    // 浮层卡片功能
+    function openCardModal(cardIndex) {
+      const modal = document.getElementById('cardModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalCategory = document.getElementById('modalCategory');
+      const modalDescription = document.getElementById('modalDescription');
+      
+      // 卡片数据
+      const cardData = [
+        {
+          category: '生活',
+          title: '有趣的都能做',
+          description: '探索生活中的美好瞬间，记录那些让人会心一笑的小确幸。在这个快节奏的世界里，我们常常忽略了身边的美好。这里记录着那些平凡却珍贵的时刻，那些让生活变得有趣的小事情。'
+        },
+        {
+          category: '创作',
+          title: '对故事的创作欲',
+          description: '分享创作过程中的灵感来源和技术实现，记录每一次突破。创作是一个充满挑战和惊喜的过程，从最初的想法到最终的作品，每一步都充满了可能性。这里分享创作的心路历程和技术探索。'
+        },
+        {
+          category: '学习',
+          title: '简单都能当老师',
+          description: '将复杂的概念用简单的方式表达，让学习变得更加有趣。教学相长，在分享知识的过程中，我们也在不断学习和成长。这里记录着学习的心得和教学的感悟。'
+        },
+        {
+          category: '娱乐',
+          title: '休闲玩乐，乐不停',
+          description: '生活不只有工作，还有诗和远方，记录那些快乐时光。娱乐是生活的调味剂，让我们在忙碌的工作之余找到放松和快乐。这里分享那些有趣的娱乐体验和快乐时光。'
+        }
+      ];
+      
+      const data = cardData[cardIndex];
+      modalCategory.textContent = data.category;
+      modalTitle.textContent = data.title;
+      modalDescription.textContent = data.description;
+      
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      
+      // 添加动画效果
+      setTimeout(() => {
+        modal.classList.add('show');
+      }, 10);
+    }
+    
+    function closeCardModal() {
+      const modal = document.getElementById('cardModal');
+      modal.classList.remove('show');
+      
+      setTimeout(() => {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+      }, 300);
+    }
+  </script>
+  
+  <!-- 浮层卡片模态框 -->
+  <div id="cardModal" class="card-modal">
+    <div class="modal-backdrop" onclick="closeCardModal()"></div>
+    <div class="modal-card">
+      <button class="modal-close-btn" onclick="closeCardModal()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="modal-content">
+        <div class="modal-category" id="modalCategory">分类</div>
+        <h2 class="modal-title" id="modalTitle">标题</h2>
+        <p class="modal-description" id="modalDescription">描述内容</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

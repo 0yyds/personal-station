@@ -1,0 +1,23 @@
+<svg width="600" height="800" viewBox="0 0 600 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="600" height="800" fill="#F8FAFC" />
+  
+  <!-- 装饰元素 -->
+  <circle cx="500" cy="100" r="80" fill="#5686F5" opacity="0.1" />
+  <circle cx="450" cy="200" r="120" fill="#7792FF" opacity="0.1" />
+  <circle cx="550" cy="300" r="60" fill="#5686F5" opacity="0.1" />
+  <circle cx="480" cy="400" r="100" fill="#7792FF" opacity="0.1" />
+  <circle cx="520" cy="550" r="70" fill="#5686F5" opacity="0.1" />
+  <circle cx="450" cy="650" r="90" fill="#7792FF" opacity="0.1" />
+  <circle cx="550" cy="750" r="50" fill="#5686F5" opacity="0.1" />
+  
+  <!-- 抽象形状 -->
+  <path d="M400 50 L500 150 L450 250 L550 350 L500 450 L600 550 L500 650 L550 750" stroke="#5686F5" stroke-width="3" stroke-linecap="round" opacity="0.3" />
+  
+  <!-- 暗模式适配 -->
+  <style>
+    @media (prefers-color-scheme: dark) {
+      rect { fill: #0E141B; }
+    }
+  </style>
+</svg>
